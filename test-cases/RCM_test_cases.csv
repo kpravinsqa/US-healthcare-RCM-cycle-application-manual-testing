@@ -1,0 +1,72 @@
+TC ID,Module,Scenario ID,Req ID,Title,Preconditions,Steps,Test Data,Expected,Priority,Type,Cycle 1,Cycle 2,Defect,Automated Test
+TC_RCM_AUTH_001,AUTH,TS_RCM_AUTH_01,REQ-01,Billing Admin login,,1. Log in as billing_admin,billing_admin / Health@123,Lands on Patients; all 5 modules in menu,P1,Functional,Pass,Pass,,tests/ui/test_login_and_roles.py::test_each_role_lands_on_its_home_page
+TC_RCM_AUTH_002,AUTH,TS_RCM_AUTH_01,REQ-01,Provider login lands on dashboard,,1. Log in as dr_smith,,Provider Dashboard shown for Dr. John Smith,P1,Functional,Pass,Pass,,tests/ui/test_login_and_roles.py::test_each_role_lands_on_its_home_page
+TC_RCM_AUTH_003,AUTH,TS_RCM_AUTH_02,REQ-01,Username is case-sensitive,,1. Log in as BILLING_ADMIN,,Error 'Invalid username or password',P2,Negative,Pass,Pass,,tests/ui/test_login_and_roles.py::test_invalid_login
+TC_RCM_AUTH_004,AUTH,TS_RCM_AUTH_03,REQ-02,Front Desk menu hides billing modules,,1. Log in as front_desk,,Only Patients and Encounters visible,P1,Security,Pass,Pass,,tests/ui/test_login_and_roles.py::test_front_desk_menu_hides_billing_modules
+TC_RCM_AUTH_005,AUTH,TS_RCM_AUTH_03,REQ-02,Front Desk direct URL to Claims,,"1. Log in as front_desk
+2. Open /claims.html",,'Access denied' page; no claim data,P1,Security,Pass,Pass,,tests/ui/test_login_and_roles.py::test_front_desk_direct_url_to_claims_is_denied
+TC_RCM_AUTH_006,AUTH,TS_RCM_AUTH_03,REQ-02,Front Desk calls Claims API,,1. Use front_desk token on GET /api/claims,,403 'You do not have permission to access this module',P1,Security,Pass,Pass,,tests/api/test_rcm_api.py::test_front_desk_cannot_call_claims_api
+TC_RCM_AUTH_007,AUTH,TS_RCM_AUTH_03,REQ-02,Session timeout after 15 minutes idle,,"1. Log in
+2. Stay idle 15 minutes
+3. Click any menu",,Redirected to login with session-expired message,P2,Security,Fail,Fail,DEF-RCM-06,
+TC_RCM_PAT_001,PAT,TS_RCM_PAT_01,REQ-03,Register insured patient,,"1. Fill all demographics
+2. Payer Cigna, member ID CIG1234567
+3. Register",,Toast with new MRN; patient searchable by name,P1,Functional,Pass,Pass,,tests/ui/test_patient_registration.py::test_register_insured_patient
+TC_RCM_PAT_002,PAT,TS_RCM_PAT_02,REQ-03,DOB in the future,,"1. Enter tomorrow's date as DOB
+2. Register",,'Date of birth cannot be in the future',P1,Negative,Pass,Pass,,tests/ui/test_patient_registration.py::test_registration_field_validation
+TC_RCM_PAT_003,PAT,TS_RCM_PAT_02,REQ-03,DOB more than 120 years ago,,"1. Enter 1890-01-01
+2. Register",,'Date of birth cannot be more than 120 years ago',P2,Boundary,Pass,Pass,,tests/ui/test_patient_registration.py::test_registration_field_validation
+TC_RCM_PAT_004,PAT,TS_RCM_PAT_02,REQ-03,Phone 9 / 10 / 11 digits,,"1. Register with 9, 10 and 11-digit phone numbers",,Only 10 digits accepted,P2,Boundary,Pass,Pass,,tests/ui/test_patient_registration.py::test_registration_field_validation
+TC_RCM_PAT_005,PAT,TS_RCM_PAT_02,REQ-03,Names allow apostrophe and hyphen,,1. Register O'Brien-Smith,,Accepted and displayed correctly,P2,Functional,Fail,Pass,DEF-RCM-04,
+TC_RCM_PAT_006,PAT,TS_RCM_PAT_02,REQ-03,ZIP must be 5 digits,,1. Enter 7870,,'ZIP code must be 5 digits',P3,Negative,Pass,Pass,,tests/ui/test_patient_registration.py::test_registration_field_validation
+TC_RCM_PAT_007,PAT,TS_RCM_PAT_03,REQ-04,Member ID disabled for Self-Pay,,1. Select payer Self-Pay,,Member ID disabled and cleared,P2,UI,Pass,Pass,,tests/ui/test_patient_registration.py::test_member_id_disabled_for_self_pay
+TC_RCM_PAT_008,PAT,TS_RCM_PAT_03,REQ-04,Member ID length and characters,,"1. Enter AB12
+2. Enter AET-12345",,'Member ID must be 6-15 letters or digits',P2,Boundary,Pass,Pass,,tests/ui/test_patient_registration.py::test_registration_field_validation
+TC_RCM_PAT_009,PAT,TS_RCM_PAT_04,REQ-05,"Same name and DOB, different case",,1. Register 'emily CARTER' 1985-04-12 (exists as Emily Carter),,'Possible duplicate: patient MRN000100 has the same name and date of birth',P1,Functional,Pass,Pass,,tests/ui/test_patient_registration.py::test_duplicate_patient_detection
+TC_RCM_PAT_010,PAT,TS_RCM_PAT_05,REQ-05,Search by MRN and partial name,,"1. Search MRN000101
+2. Search 'carter'",,Exact MRN returns 1; name search case-insensitive,P2,Functional,Pass,Pass,,tests/ui/test_patient_registration.py::test_patient_search
+TC_RCM_PRV_001,PRV,TS_RCM_PRV_01,REQ-06,Valid NPI passes check digit,,"1. Enter 1234567893
+2. Tab out",,'✔ Valid NPI',P1,Functional,Pass,Pass,,tests/ui/test_providers_npi.py::test_npi_inline_validation_boundaries
+TC_RCM_PRV_002,PRV,TS_RCM_PRV_01,REQ-06,NPI 9 and 11 digits (BVA),,"1. Enter 123456789
+2. Enter 12345678931",,'NPI must be exactly 10 digits',P1,Boundary,Fail,Pass,DEF-RCM-02,tests/ui/test_providers_npi.py::test_npi_inline_validation_boundaries
+TC_RCM_PRV_003,PRV,TS_RCM_PRV_01,REQ-06,NPI with invalid check digit,,1. Enter 1234567890,,'NPI check digit is invalid',P1,Negative,Fail,Pass,DEF-RCM-03,tests/ui/test_providers_npi.py::test_npi_inline_validation_boundaries
+TC_RCM_PRV_004,PRV,TS_RCM_PRV_01,REQ-06,NPI with letters,,1. Enter 12345ABCDE,,'NPI must contain digits only',P2,Negative,Pass,Pass,,tests/ui/test_providers_npi.py::test_npi_inline_validation_boundaries
+TC_RCM_PRV_005,PRV,TS_RCM_PRV_02,REQ-06,Add provider with valid NPI,,"1. Enter Anita Desai, NPI 1456789019, Pediatrics
+2. Add",,Provider listed with specialty,P1,Functional,Pass,Pass,,tests/ui/test_providers_npi.py::test_add_provider_with_valid_npi
+TC_RCM_PRV_006,PRV,TS_RCM_PRV_02,REQ-07,Duplicate NPI rejected,,1. Add provider with NPI 1234567893 (exists),,'A provider with this NPI already exists',P2,Negative,Pass,Pass,,tests/ui/test_providers_npi.py::test_duplicate_npi_rejected
+TC_RCM_ENC_001,ENC,TS_RCM_ENC_01,REQ-09,Multi-line encounter total,,"1. Add 99214 x1, 93000 x1, 36415 x2",,Total $244.00 (175 + 45 + 24),P1,Functional,Pass,Pass,,tests/ui/test_encounters_dashboard.py::test_create_encounter_with_multiple_lines
+TC_RCM_ENC_002,ENC,TS_RCM_ENC_01,REQ-09,Units change recalculates total,,"1. Select 99213 x1
+2. Change units to 3",,Total updates $120.00 → $360.00,P2,Functional,Pass,Pass,,tests/ui/test_encounters_dashboard.py::test_total_charge_recalculates_live
+TC_RCM_ENC_003,ENC,TS_RCM_ENC_01,REQ-09,Units 0 and 100 rejected,,"1. Save with units 0
+2. Save with units 100",,'Units must be between 1 and 99',P2,Boundary,Pass,Pass,,tests/api/test_rcm_api.py::test_encounter_line_validation
+TC_RCM_ENC_004,ENC,TS_RCM_ENC_02,REQ-08,DOS in the future,,"1. Set DOS tomorrow
+2. Save",,'Date of service cannot be in the future',P1,Negative,Pass,Pass,,tests/ui/test_encounters_dashboard.py::test_date_of_service_rules
+TC_RCM_ENC_005,ENC,TS_RCM_ENC_02,REQ-08,DOS before patient DOB,,1. DOS 1980-01-01 for patient born 1985,,'Date of service cannot be before the patient's date of birth',P2,Negative,Pass,Pass,,tests/ui/test_encounters_dashboard.py::test_date_of_service_rules
+TC_RCM_ENC_006,ENC,TS_RCM_ENC_03,REQ-08,Valid ICD-10 formats incl. 7-character and lowercase,,"1. Enter I10, E11.9, S72.001A, j06.9",,All accepted; lowercase normalised,P1,Functional,Pass,Pass,,tests/ui/test_encounters_dashboard.py::test_icd10_format_validation
+TC_RCM_ENC_007,ENC,TS_RCM_ENC_03,REQ-08,Invalid ICD-10 format,,"1. Enter 12345
+2. Enter E11.12345",,'… is not a valid ICD-10-CM code',P2,Negative,Pass,Pass,,tests/ui/test_encounters_dashboard.py::test_icd10_format_validation
+TC_RCM_ENC_008,ENC,TS_RCM_ENC_02,REQ-08,Diagnosis and procedure mandatory,,"1. Save with no dx
+2. Add dx and save with no CPT",,Both errors shown in order,P1,Negative,Pass,Pass,,tests/ui/test_encounters_dashboard.py::test_encounter_requires_diagnosis_and_procedure
+TC_RCM_DASH_001,DASH,TS_RCM_DASH_01,REQ-10,New encounter visible with full details,,"1. Create encounter for Dr. Smith (R07.9
+2. 99214, 93000)
+3. Log in as dr_smith",,"Row shows patient, dx R07.9, CPT '99214, 93000', charge $220.00; KPIs updated",P1,Functional,Fail,Pass,DEF-RCM-01,tests/ui/test_encounters_dashboard.py::test_new_encounter_appears_on_provider_dashboard
+TC_RCM_DASH_002,DASH,TS_RCM_DASH_01,REQ-10,Provider sees only own encounters,,"1. Create encounter for Dr. Rao
+2. Log in as dr_smith",,Empty state; KPI encounters = 0,P1,Security,Pass,Pass,,tests/ui/test_encounters_dashboard.py::test_provider_sees_only_own_encounters
+TC_RCM_DASH_003,DASH,TS_RCM_DASH_02,REQ-10,KPI reconciliation open vs billed,,"1. Create 2 encounters
+2. Bill one",,"Encounters 2, Open 1, Billed 1, charges = sum",P2,Functional,Pass,Pass,,tests/api/test_rcm_api.py::test_dashboard_summary_matches_encounters
+TC_RCM_DASH_004,DASH,TS_RCM_DASH_01,REQ-10,Units shown on CPT column,,1. Create encounter with 36415 x2,,CPT column shows '36415×2',P3,UI,Pass,Pass,,
+TC_RCM_CLM_001,CLM,TS_RCM_CLM_01,REQ-11,Create and submit claim,,"1. Create claim from open encounter
+2. Submit",,Claim CLM-xxxxxxx DRAFT → SUBMITTED; billed = encounter charge,P1,Functional,Pass,Pass,,tests/ui/test_claims.py::test_create_and_submit_claim
+TC_RCM_CLM_002,CLM,TS_RCM_CLM_01,REQ-11,Second claim for same encounter,,1. Create claim twice for one encounter,,409 'A claim already exists for this encounter',P1,Negative,Pass,Pass,,tests/api/test_rcm_api.py::test_claim_cannot_be_created_twice
+TC_RCM_CLM_003,CLM,TS_RCM_CLM_02,REQ-12,Self-pay claim rejected,,"1. Create claim for Self-Pay patient
+2. Submit",,Status REJECTED with scrub message,P1,Negative,Pass,Pass,,tests/ui/test_claims.py::test_self_pay_claim_is_rejected_by_scrubber
+TC_RCM_CLM_004,CLM,TS_RCM_CLM_02,REQ-12,Timely filing day 365 vs 366,,1. Submit claims with DOS 365 and 366 days ago,,365 SUBMITTED; 366 REJECTED 'Timely filing limit exceeded',P1,Boundary,Fail,Pass,DEF-RCM-05,tests/ui/test_claims.py::test_timely_filing_boundary
+TC_RCM_CLM_005,CLM,TS_RCM_CLM_03,REQ-13,Partial then full payment,,"1. Claim $175
+2. Post paid 100 + adj 25
+3. Post paid 50",,PARTIALLY_PAID balance $50 → PAID balance $0,P1,Functional,Pass,Pass,,tests/ui/test_claims.py::test_partial_then_full_payment
+TC_RCM_CLM_006,CLM,TS_RCM_CLM_03,REQ-13,Overpayment blocked,,"1. Claim $120
+2. Post 120.01",,'Paid + adjustment cannot exceed the outstanding balance',P1,Boundary,Pass,Pass,,tests/ui/test_claims.py::test_overpayment_is_blocked
+TC_RCM_CLM_007,CLM,TS_RCM_CLM_03,REQ-13,Payment on DRAFT claim,,1. Post payment to a DRAFT claim via API,,409 'Payments can only be posted to submitted claims',P2,Negative,Pass,Pass,,tests/api/test_rcm_api.py::test_payment_on_draft_claim_rejected
+TC_RCM_CLM_008,CLM,TS_RCM_CLM_03,REQ-13,Negative paid / adjustment amounts,,"1. Post -1
+2. Post adjustment -5",,Validation error on the field,P2,Negative,Pass,Pass,,tests/api/test_rcm_api.py::test_payment_amount_validation
+TC_RCM_CLM_009,CLM,TS_RCM_CLM_04,REQ-11,Claim list export to CSV for billing team,,1. Click Export on Claims,,CSV with all visible columns,P3,Functional,Blocked,Pass,,
